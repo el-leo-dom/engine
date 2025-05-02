@@ -1,12 +1,17 @@
 #include "SDL3/SDL.h"
 #include "SDL3/SDL_main.h"
 #include "SDL3_image/SDL_image.h"
+#include "SDL3_ttf/SDL_ttf.h"
 #include <string>
 
 
 
 class LTexture {
 public:
+
+    //constante simbolica de stretch acho eu
+    
+    static constexpr float kOriginalSize = -1.f;
 
     //inicia as variaveis
     LTexture();
@@ -17,11 +22,23 @@ public:
     //dá load a um ficheiro dado path
     bool loadFromFile(std::string path);
 
+    //Creates texture from text
+    bool loadFromRenderedText(std::string textureText, SDL_Color textColor);
+
     //dá cleanup na textura
     void destroy();
 
+    // cor
+    void setColor(Uint8 r, Uint8 g, Uint8 b);
+
+    // opacidade
+    void setAlpha(Uint8 alpha);
+
+    // blend mode (nao sei o que é ainda)
+    void setBlending( SDL_BlendMode blendMode);
+
     //desenha a textura
-    void render(float x, float y);
+    void render(float x, float y, SDL_FRect* clip = nullptr, float width = kOriginalSize, float height = kOriginalSize, double degrees = 0.0, SDL_FPoint* center = nullptr);
 
     //dá get nas dimensoes da textura
     int getWidth();
@@ -46,8 +63,7 @@ SDL_Renderer* gRenderer{ nullptr };
 
 
 
-LTexture gPngTexture1;
-LTexture gPngTexture2;
+LTexture gUpTexture, gDownTexture;
 
 
 LTexture::LTexture() :
@@ -157,11 +173,13 @@ bool loadMedia() {
     // flag de sucesso
     bool success{ true };
     
-    // load na splash image
-    success = gPngTexture1.loadFromFile("ron.png");
-    success = gPngTexture2.loadFromFile("snail.bmp");
+    success &= gUpTexture.loadFromFile("ron.png");
     if (!success) {
-        SDL_Log("Não deu para dar load no png");
+        SDL_Log("Não deu para dar load no ron png");
+    };
+    success &= gDownTexture.loadFromFile("snail.bmp");
+    if (!success) {
+        SDL_Log("Não deu para dar load no snail bmp");
     };
 
     return success;
@@ -171,8 +189,8 @@ void close() {
     
     //clean up na textura
 
-    gPngTexture1.destroy();
-    gPngTexture2.destroy();
+    gUpTexture.destroy();
+    gDownTexture.destroy();
 
     //destruir a janela e o renderer
     SDL_DestroyRenderer(gRenderer);
@@ -217,6 +235,10 @@ int main(int argc, char** argv)
             SDL_Event e;
             SDL_zero( e );
 
+            LTexture* currentTexture = &gUpTexture;
+
+            SDL_Color bgColor = { 0xFF, 0xFF, 0xFF, 0xFF };
+
             //main loop agora
 
             while ( quit == false ) {
@@ -230,15 +252,48 @@ int main(int argc, char** argv)
                         //fechar o main loop
                         quit = true;
                     }
+
+                    // isto verifica o cima ou baixo
+                    else if (e.type == SDL_EVENT_KEY_DOWN) {
+                        if (e.key.key == SDLK_UP) {
+                            currentTexture = &gDownTexture;
+                        }
+                        else if (e.key.key == SDLK_DOWN) {
+                            currentTexture = &gUpTexture;
+                        }
+                    }
                 }
 
+                // reset da cor para branco
+                bgColor.r = 0xFF;
+                bgColor.g = 0xFF;
+                bgColor.b = 0xFF;
+
+
+                // isto vai buscar o pointer para um array que tem um 1 ou 0 para cada pressed key atualmente
+
+                const bool* keyStates = SDL_GetKeyboardState(nullptr);
+
+                if (keyStates[SDL_SCANCODE_UP]) {
+                    //RED
+                    bgColor.r = 0xFF;
+                    bgColor.g = 0x00;
+                    bgColor.b = 0x00;
+                }
+                else if (keyStates[SDL_SCANCODE_DOWN]) {
+                    //GREEN
+                    bgColor.r = 0x00;
+                    bgColor.g = 0xFF;
+                    bgColor.b = 0x00;
+                }
+
+
                 //pintar de branco a superficie
-                SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
+                SDL_SetRenderDrawColor(gRenderer, bgColor.r, bgColor.g, bgColor.b, 0xFF);
                 SDL_RenderClear(gRenderer);
 
                 //render na imagem
-                gPngTexture1.render(0.f, 0.f);
-                gPngTexture2.render(200.f, 200.f);
+                currentTexture->render(( kScreenWidth - currentTexture->getWidth()) / 2.f, (kScreenHeight - currentTexture->getHeight()) / 2.f);
 
                 //update no screen
                 SDL_RenderPresent(gRenderer);
