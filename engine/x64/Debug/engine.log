@@ -1,17 +1,2 @@
 ﻿  main.cpp
-C:\Users\leona\Desktop\cpp\engine\engine\main.cpp(127,16): error C2511: 'void LTexture::render(float,float)': overloaded member function not found in 'LTexture'
-      C:\Users\leona\Desktop\cpp\engine\engine\main.cpp(9,7):
-      see declaration of 'LTexture'
-  
-C:\Users\leona\Desktop\cpp\engine\engine\main.cpp(129,33): error C2440: 'static_cast': cannot convert from 'unknown' to 'float'
-      C:\Users\leona\Desktop\cpp\engine\engine\main.cpp(129,33):
-      Context does not allow for disambiguation of overloaded function
-  
-C:\Users\leona\Desktop\cpp\engine\engine\main.cpp(129,61): error C2440: 'static_cast': cannot convert from 'unknown' to 'float'
-      C:\Users\leona\Desktop\cpp\engine\engine\main.cpp(129,61):
-      Context does not allow for disambiguation of overloaded function
-  
-C:\Users\leona\Desktop\cpp\engine\engine\main.cpp(132,34): error C2597: illegal reference to non-static member 'LTexture::mTexture'
-      C:\Users\leona\Desktop\cpp\engine\engine\main.cpp(50,18):
-      see declaration of 'LTexture::mTexture'
-  
+  engine.vcxproj -> C:\Users\leona\Desktop\cpp\engine\x64\Debug\engine.exe
