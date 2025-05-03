@@ -396,7 +396,7 @@ public:
     static constexpr int kDotWidth = 20;
     static constexpr int kDotHeight = 20;
 
-    static constexpr float kDotVel = 5.0f;
+    static constexpr float kDotVel = 10.0f;
 
     Dot(); 
 
@@ -427,29 +427,37 @@ void Dot::handleEvent(SDL_Event& e) {
         switch (e.key.key) {
         case SDLK_UP: mVelY -= kDotVel; break;
         case SDLK_DOWN: mVelY += kDotVel; break;
-        case SDLK_SPACE: mVelY += kDotVel * 2; break;
-        case SDLK_LEFT: mVelX -= kDotVel; break;
-        case SDLK_RIGHT: mVelX += kDotVel; break;
+        case SDLK_SPACE: mVelY += kDotVel * 2.0f; break;
+        case SDLK_LEFT: mVelX -= kDotVel * 0.5f; break;
+        case SDLK_RIGHT: mVelX += kDotVel * 0.5f; break;
+        }
+    }
+    else if (e.type == SDL_EVENT_KEY_UP && e.key.repeat == 0) {
+        switch (e.key.key) {
+        case SDLK_LEFT: mVelX += kDotVel * 0.5f; break;
+        case SDLK_RIGHT: mVelX -= kDotVel * 0.5f; break;
         }
     }
 }
 
 void Dot::move() {
-    if (mPosX > kScreenWidth - 20) {
-        mPosY = kScreenWidth - kDotWidth;
-        mVelX = mVelX * -1.f;
+    if (mPosX > kScreenWidth - kDotWidth) {
+
+        mPosX = kScreenWidth - kDotWidth;
+        if (fabs(mVelX) < 3.f) {
+            mVelX = 0.f;
+        }
     }
-    else if (mPosX < 0) {
-        mVelX = mVelX * -1.f;
+
+    else if (mPosX <= 0) {
+        mPosX = 0;
+
     }
 
     if (mPosY > kScreenHeight - kDotHeight) {
         mPosY = kScreenHeight - kDotHeight;
-        mVelY *= -0.9f;
+        mVelY *= 0.f;
 
-        if (fabs(mVelY) < 3.f) {
-            mVelY = 0.f;
-        }
     }
     else {
         mVelY += accDueToGravity;
